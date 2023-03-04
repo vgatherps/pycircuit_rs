@@ -1,0 +1,4 @@
+**/*pycache
+data
+.mypy_cache
+.pytest_cache

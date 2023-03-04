@@ -1,0 +1,8 @@
+include "common.fbs";
+
+table MdMessage {
+    local_time_us:int64;
+    message:RawMdMessage;
+}
+
+root_type MdMessage;

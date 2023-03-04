@@ -1,5 +1,8 @@
 /target
 /Cargo.lock
 venv
-*/**__pycache__
+**/__pycache__/
+**/*pycache
 .vscode
+.mypy_cache
+.pytest_cache
