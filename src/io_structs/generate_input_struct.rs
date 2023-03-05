@@ -7,9 +7,9 @@
 // Further, this should be *far* faster to compile than the trait abstraction
 
 #[macro_export]
-macro_rules! generate_input_type {
+macro_rules! __generate_input_type_helper {
     ($ty:ty) => {
-        $crate::generate_input_type!(invalid $ty)
+        $crate::__generate_input_type_helper!(invalid $ty)
     };
     (invalid $ty:ty) => {
          Option<&'a $ty>
@@ -29,36 +29,38 @@ macro_rules! generate_input_struct {
     };
 
     (@munch $struct_name:ident @gen {$($gen:ident),*} @ongoing {$($ongoing:tt)*} @rest {}) => {
-        pub struct $struct_name <'a, $($gen),*> {
-            $($ongoing)*
-        }
+        concat_idents::concat_idents!(st_name = $struct_name, Input {
+            pub struct st_name <'a, $($gen),*> {
+                $($ongoing)*
+            }
+        });
     };
 
     (@munch $struct_name:ident @gen {$($gen:ident),*} @ongoing {$($ongoing:tt)*} @rest {$name:ident -> $ty:ty}) => {
         $crate::generate_input_struct!(@munch $struct_name @gen {$($gen),*} @ongoing {
             $($ongoing)*
-            pub $name: $crate::generate_input_type!($ty),
+            pub $name: $crate::__generate_input_type_helper!($ty),
         } @rest {});
     };
 
     (@munch $struct_name:ident @gen {$($gen:ident),*} @ongoing {$($ongoing:tt)*} @rest {$name:ident -> $how:ident $ty:ty}) => {
         $crate::generate_input_struct!(@munch $struct_name @gen {$($gen),*} @ongoing {
             $($ongoing)*
-            pub $name: $crate::generate_input_type!($how $ty),
+            pub $name: $crate::__generate_input_type_helper!($how $ty),
         } @rest {});
     };
 
         (@munch $struct_name:ident @gen {$($gen:ident),*} @ongoing {$($ongoing:tt)*} @rest {$name:ident -> $ty:ty, $($rest:tt)*}) => {
         $crate::generate_input_struct!(@munch $struct_name @gen {$($gen),*} @ongoing {
             $($ongoing)*
-            pub $name: $crate::generate_input_type!($ty),
+            pub $name: $crate::__generate_input_type_helper!($ty),
         } @rest {$($rest)*});
     };
 
     (@munch $struct_name:ident @gen {$($gen:ident),*} @ongoing {$($ongoing:tt)*} @rest {$name:ident -> $how:ident $ty:ty, $($rest:tt)*}) => {
         $crate::generate_input_struct!(@munch $struct_name @gen {$($gen),*} @ongoing {
             $($ongoing)*
-            pub $name: $crate::generate_input_type!($how $ty),
+            pub $name: $crate::__generate_input_type_helper!($how $ty),
         } @rest {$($rest)*});
     };
 }
@@ -67,20 +69,20 @@ macro_rules! generate_input_struct {
 #[cfg(test)]
 mod example_compiles {
 
-    generate_input_struct!(Input: a -> u32, b -> valid u64, c -> invalid f64);
+    generate_input_struct!(Test: a -> u32, b -> valid u64, c -> invalid f64);
 
-    fn create_input<'a>(a: &'a u32, b: &'a u64) -> Input<'a> {
-        Input {
+    fn create_input<'a>(a: &'a u32, b: &'a u64) -> TestInput<'a> {
+        TestInput {
             a: Some(a),
             b,
             c: None,
         }
     }
 
-    generate_input_struct!(GenInput<T, G>: a -> T, b -> valid G, c -> invalid f64);
+    generate_input_struct!(GenTest<T, G>: a -> T, b -> valid G, c -> invalid f64);
 
-    fn create_generic_input<'a, T, G>(a: &'a T, b: &'a G) -> GenInput<'a, T, G> {
-        GenInput {
+    fn create_generic_input<'a, T, G>(a: &'a T, b: &'a G) -> GenTestInput<'a, T, G> {
+        GenTestInput {
             a: Some(a),
             b,
             c: None,
