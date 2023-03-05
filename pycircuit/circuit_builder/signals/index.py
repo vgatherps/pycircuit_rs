@@ -8,7 +8,6 @@ def generate_static_index_definition(offset: int) -> Definition:
         class_name=f"StaticIndex",
         output_specs=frozendict(out=OutputSpec(ephemeral=True, type_path="Output")),
         inputs=frozendict({"a": BasicInput()}),
-        static_call=True,
         header="signals/basic_operators.hh",
         generic_callset=CallSpec(
             observes=frozenset(),

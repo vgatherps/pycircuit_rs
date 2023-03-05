@@ -10,8 +10,6 @@ from frozenlist import FrozenList
 from pycircuit.circuit_builder.definition import Definition, BasicInput, ArrayInput
 from pycircuit.circuit_builder.definition import InputType, InputMetadata
 
-TIME_TYPE = "std::uint64_t"
-
 # TODO remove component running indices
 
 

@@ -35,7 +35,6 @@ def generate_constant_definition(constant_type: str, constructor: str) -> Defini
             )
         ),
         inputs=frozendict(),
-        static_call=True,
         header="signals/constant.hh",
         differentiable_operator_name="constant",
         metadata=frozendict({"constant_value": constructor}),
@@ -59,7 +58,6 @@ def generate_triggerable_constant_definition(
             )
         ),
         inputs=frozendict({"tick": BasicInput()}),
-        static_call=True,
         header="signals/constant.hh",
         generic_callset=CallSpec(
             written_set=frozenset(["tick"]),
@@ -87,7 +85,6 @@ def _do_generate_parameter_definition(required: bool, op_name: str) -> Definitio
         inputs=frozendict(
             {"a": BasicInput(meta=InputMetadata(optional=True, allow_unused=True))}
         ),
-        static_call=True,
         header="signals/parameter.hh",
         init_spec=InitSpec(
             init_call="init",

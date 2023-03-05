@@ -6,11 +6,9 @@ from dataclasses_json import DataClassJsonMixin
 from frozendict import frozendict
 from frozenlist import FrozenList
 
-from pycircuit.circuit_builder.definition import Definition, BasicInput, ArrayInput
-from pycircuit.circuit_builder.definition import InputType
+from pycircuit.circuit_builder.definition import Definition
 from pycircuit.circuit_builder.component import Component
 from pycircuit.circuit_builder.component import (
-    TIME_TYPE,
     ArrayComponentInput,
     ComponentInput,
     ExternalInput,

@@ -8,7 +8,6 @@ def generate_binary_definition(diff_name: str, operator_name: str) -> Definition
         class_name=operator_name,
         output_specs=frozendict(out=OutputSpec(ephemeral=True, type_path="Output")),
         inputs=frozendict({"a": BasicInput(), "b": BasicInput()}),
-        static_call=True,
         header="signals/basic_arithmetic.hh",
         generic_callset=CallSpec(
             observes=frozenset(),

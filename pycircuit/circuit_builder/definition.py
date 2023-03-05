@@ -300,7 +300,7 @@ class OutputSpec(DataClassJsonMixin):
         if self.default_constructor is not None:
             return self.default_constructor
         else:
-            return "{}"
+            return "Default::default()"
 
 
 @dataclass(eq=True, frozen=True)
@@ -359,15 +359,8 @@ class Definition(DataClassJsonMixin):
                         {'a': 0, 'b': 1}, and the class definition would be
                         AddClass<a_type, b_type> instead of AddClass
 
-        static_call: Whether or not the class should be called statically or on an object.
-                     Classes that are called statically *will not* have a component object
-                     stored in the circuit.
-
         init_spec: If the component requires nontrivial initialization, this specifies
                    how said initialization should be carried out.
-                   This is distinct from static call - a component that simply writes a constant
-                   into a circuit output would get called at init, but never get
-                   called by the circuit and shouldn't ever use up any storage
 
         differentiable_operator_name: If the component can be replicated offline by a
                                       pytorch/tensorflow operation, this is the name of said
@@ -405,8 +398,6 @@ class Definition(DataClassJsonMixin):
     generics_order: frozendict[str, int] = field(
         default_factory=frozendict,
     )
-
-    static_call: bool = False
 
     init_spec: Optional[InitSpec] = None
 

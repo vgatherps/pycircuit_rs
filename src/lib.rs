@@ -1,3 +1,5 @@
+mod io_structs;
+
 pub fn add(left: usize, right: usize) -> usize {
     left + right
 }
