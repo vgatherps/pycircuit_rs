@@ -15,6 +15,9 @@ generate_output_struct!(Adder<O>: out -> O);
 
 // codegen might have to resort to unsafe or something, this is unacceptable
 // as is and the copy constraint is another level of unacceptability
+//
+// Potentially could go down the handle path as well but that makes it sort of painful
+// to build your own structs/signals lol
 pub trait AdderTypes {
     type Output;
     type OutputStruct<'a>;
