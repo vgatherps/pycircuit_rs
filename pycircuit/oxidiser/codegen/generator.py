@@ -3,19 +3,22 @@ from abc import ABC, abstractmethod
 
 
 class CodeLeaf:
+    @abstractmethod
     def generate_code(self) -> str:
-        return ""
+        ...
 
 
-class GlobalInitLeaf(CodeLeaf, Hashable):
+class GlobalInitLeaf(Hashable):
     @abstractmethod
     def generate_global_init_code(self) -> str:
-        pass
+        ...
 
 
 class CodeTree:
-    def get_tree_children(self) -> List["CodeNode"]:
-        return []
+    @abstractmethod
+    def get_tree_children(self) -> List["TreeNode"]:
+        ...
 
 
-CodeNode = CodeTree | CodeLeaf
+LeafNode = CodeLeaf | GlobalInitLeaf
+TreeNode = CodeTree | LeafNode

@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 from typing import List
-from pycircuit.oxidiser.codegen.generator import CodeLeaf, CodeTree, CodeNode
+from pycircuit.oxidiser.codegen.generator import CodeLeaf, CodeTree, TreeNode
 
-from pycircuit.oxidiser.intermediate.graph.graph_variable import GraphVariable
+from pycircuit.oxidiser.codegen.graph.graph_variable import GraphVariable
 
 _RAW_INPUT_HEADER = "__raw_input_"
 
@@ -29,7 +29,7 @@ class SingleInput(CodeTree):
     variable: GraphVariable
     input_name: str
 
-    def get_tree_children(self) -> List[CodeNode]:
+    def get_tree_children(self) -> List[TreeNode]:
         return [
             self.variable,
             SingleInputLeaf(self),
@@ -61,7 +61,7 @@ class CallInputSet(CodeTree):
     inputs: List[SingleInput]
     input_struct_name: str
 
-    def get_tree_children(self) -> List[CodeNode]:
+    def get_tree_children(self) -> List[TreeNode]:
         local_input_children = [
             i for input in self.inputs for i in input.get_tree_children()
         ]

@@ -1,12 +1,18 @@
 from dataclasses import dataclass
 from typing import List
-from pycircuit.oxidiser.codegen.generator import CodeLeaf, CodeTree, CodeNode
+from pycircuit.oxidiser.codegen.generator import CodeLeaf, CodeTree, TreeNode
 
-from pycircuit.oxidiser.intermediate.graph.graph_variable import GraphVariable
+from pycircuit.oxidiser.codegen.graph.graph_variable import (
+    AlwaysValid,
+    GraphValid,
+    GraphVariable,
+)
 
 _RAW_OUTPUT_HEADER = "__raw_output_"
 
 OUTPUT_STRUCT_NAME = "__outputs"
+
+OUTPUT_VALID_RETURN_NAME = "__output_valid"
 
 
 @dataclass(frozen=True, eq=True)
@@ -22,7 +28,7 @@ class OutputRef(CodeTree):
     variable: GraphVariable
     output_name: str
 
-    def get_tree_children(self) -> List[CodeNode]:
+    def get_tree_children(self) -> List[TreeNode]:
         return [
             self.variable,
             OutputRefLeaf(self),
@@ -54,8 +60,35 @@ class CallOutputSet(CodeTree):
     outputs: List[OutputRef]
     output_struct_name: str
 
-    def get_tree_children(self) -> List[CodeNode]:
+    def get_tree_children(self) -> List[TreeNode]:
         local_input_children = [
             o for output in self.outputs for o in output.get_tree_children()
         ]
         return local_input_children + [OutputStructLeaf(self)]
+
+
+# This does not partake in the code tree since it's just a helper
+# to condense information already in other trees
+@dataclass(frozen=True, eq=True)
+class OutputValid:
+    valid: GraphValid
+    output_name: str
+
+
+@dataclass(frozen=True, eq=True)
+class OutputValidSet(CodeLeaf):
+    outputs: List[OutputValid]
+
+    def generate_code(self) -> str:
+        valid_lines = []
+        for output in self.outputs:
+            match output.valid:
+                case AlwaysValid():
+                    continue
+                case valid_var:
+                    path = valid_var.valid_path()
+                    valid_lines.append(
+                        f"{path} = {OUTPUT_VALID_RETURN_NAME}.{output.output_name}"
+                    )
+
+        return "\n".join(valid_lines)

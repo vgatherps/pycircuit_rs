@@ -3,7 +3,7 @@ from typing import List
 
 from pycircuit.oxidiser.codegen.generator import (
     CodeLeaf,
-    CodeNode,
+    TreeNode,
     CodeTree,
     GlobalInitLeaf,
 )
@@ -86,5 +86,5 @@ class GraphVariable(CodeTree):
     var: GraphVar
     valid: GraphValid
 
-    def get_tree_children(self) -> List[CodeNode]:
+    def get_tree_children(self) -> List[TreeNode]:
         return [self.var, self.valid]
