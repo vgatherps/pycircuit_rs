@@ -3,7 +3,6 @@ from dataclasses import dataclass
 from typing import Any, Dict, List, Mapping, Optional, Set, Union
 
 from dataclasses_json import DataClassJsonMixin
-from frozendict import frozendict
 from frozenlist import FrozenList
 
 from pycircuit.circuit_builder.definition import Definition
@@ -19,6 +18,7 @@ from pycircuit.circuit_builder.component import (
 )
 from pycircuit.circuit_builder.component import ComponentOutput
 from pycircuit.circuit_builder.component import ComponentIndex
+from pycircuit.common.frozen import FrozenDict
 
 from .signals.constant import (
     generate_constant_definition,
@@ -41,7 +41,7 @@ class _PartialComponent(DataClassJsonMixin):
     name: str
     definition: str
     class_generics: Dict[str, str]
-    params: Optional[frozendict[str, Any]]
+    params: Optional[FrozenDict[str, Any]]
 
 
 @dataclass(eq=True, frozen=True)
@@ -52,7 +52,7 @@ class ExternalStruct:
 
 @dataclass(eq=True, frozen=True)
 class CallStruct(DataClassJsonMixin):
-    inputs: frozendict[str, str]
+    inputs: FrozenDict[str, str]
 
     external_struct: Optional[ExternalStruct] = None
 
@@ -61,14 +61,14 @@ class CallStruct(DataClassJsonMixin):
         inputs: Dict[str, str],
         external_struct: Optional[ExternalStruct] = None,
     ) -> "CallStruct":
-        return CallStruct(inputs=frozendict(inputs), external_struct=external_struct)
+        return CallStruct(inputs=FrozenDict(inputs), external_struct=external_struct)
 
     @staticmethod
     def from_inputs(
         external_struct: Optional[ExternalStruct] = None,
         **fields: str,
     ) -> "CallStruct":
-        return CallStruct(inputs=frozendict(fields), external_struct=external_struct)
+        return CallStruct(inputs=FrozenDict(fields), external_struct=external_struct)
 
     @property
     def d_inputs(self) -> Dict[str, str]:
@@ -349,7 +349,7 @@ class CircuitBuilder(CircuitData):
                 case OutputArray(inputs=arr_input):
                     fronzen_inputs = FrozenList(
                         InputBatch(
-                            frozendict(
+                            FrozenDict(
                                 {
                                     batch_key: batch_val.output()
                                     for (batch_key, batch_val) in batch.items()
@@ -372,7 +372,7 @@ class CircuitBuilder(CircuitData):
             output_options=output_options.copy(),
             name=name,
             class_generics=generics.copy(),
-            params=frozendict(params) if params is not None else None,
+            params=FrozenDict(params) if params is not None else None,
         )
 
         comp.validate(self)

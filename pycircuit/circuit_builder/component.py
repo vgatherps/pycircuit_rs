@@ -1,14 +1,14 @@
 from abc import ABC, abstractmethod
 from collections import OrderedDict
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import dataclasses
 from typing import Any, Dict, List, Mapping, Optional, Set, Union
 
 from dataclasses_json import DataClassJsonMixin
-from frozendict import frozendict
 from frozenlist import FrozenList
 from pycircuit.circuit_builder.definition import Definition, BasicInput, ArrayInput
 from pycircuit.circuit_builder.definition import InputType, InputMetadata
+from pycircuit.common.frozen import FrozenDict
 
 
 class HasOutput(ABC):
@@ -130,7 +130,7 @@ class SingleComponentInput(DataClassJsonMixin):
 
 @dataclass(eq=True, frozen=True)
 class InputBatch:
-    inputs: frozendict[str, ComponentOutput]
+    inputs: FrozenDict[str, ComponentOutput]
 
     @property
     def d_inputs(self) -> Dict[str, ComponentOutput]:
@@ -172,10 +172,10 @@ class OutputOptions(DataClassJsonMixin):
 
 @dataclass(eq=True, frozen=True)
 class ComponentIndex:
-    inputs: frozendict[str, ComponentInput]
+    inputs: FrozenDict[str, ComponentInput]
     definition: Definition
-    class_generics: frozendict[str, str]
-    params: Optional[frozendict[str, Any]]
+    class_generics: FrozenDict[str, str]
+    params: Optional[FrozenDict[str, Any]]
 
 
 @dataclass
@@ -184,8 +184,8 @@ class Component(HasOutput):
     output_options: Dict[str, OutputOptions]
     definition: Definition
     name: str
-    class_generics: Dict[str, str]
-    params: Optional[frozendict[str, Any]]
+    class_generics: Dict[str, str] = field(default_factory=dict)
+    params: Optional[FrozenDict[str, Any]] = None
 
     def output(self, maybe_which: Optional[str] = None) -> ComponentOutput:
         match (maybe_which, self.definition.default_output):
@@ -322,9 +322,9 @@ class Component(HasOutput):
 
     def index(self) -> ComponentIndex:
         return ComponentIndex(
-            inputs=frozendict(self.inputs),
+            inputs=FrozenDict(self.inputs),
             definition=self.definition,
-            class_generics=frozendict(self.class_generics),
+            class_generics=FrozenDict(self.class_generics),
             params=self.params,
         )
 

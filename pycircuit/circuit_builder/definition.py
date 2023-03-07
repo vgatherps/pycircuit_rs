@@ -6,7 +6,8 @@ from typing import Any, Callable, Dict, List, Optional, Set, TypeVar
 
 from dataclasses_json import DataClassJsonMixin, config
 from frozenlist import FrozenList
-from frozendict import frozendict
+
+from pycircuit.common.frozen import FrozenDict
 
 
 @dataclass(eq=True, frozen=True)
@@ -69,7 +70,7 @@ def decode_input(input: Any) -> InputType:
             return BasicInput(meta=meta)
 
         case {"input_type": "array", **rest} if not rest:
-            return ArrayInput(fields=frozendict(), meta=meta)
+            return ArrayInput(fields=frozenset(), meta=meta)
         case {"input_type": "array", "fields": [*fields], **rest} if not rest:
             for field in fields:
                 if not isinstance(field, str):
@@ -111,9 +112,9 @@ def encode_dict_with(
 
 def decode_dict_with(
     decoder: Callable[[Any], T]
-) -> Callable[[Dict[str, Any]], frozendict[str, T]]:
-    def do_decode(vals: Dict[str, Any]) -> Dict[str, Any]:
-        return frozendict({name: decoder(val) for (name, val) in vals.items()})
+) -> Callable[[Dict[str, Any]], FrozenDict[str, T]]:
+    def do_decode(vals: Dict[str, Any]) -> FrozenDict[str, Any]:
+        return FrozenDict({name: decoder(val) for (name, val) in vals.items()})
 
     return do_decode
 
@@ -160,7 +161,7 @@ def decode_call_list(inputs: Any) -> None | str | FrozenList[str]:
             raise ValueError(f"Could not parse callback list {inputs}")
 
 
-def frozen() -> FrozenList[T]:
+def frozenlist() -> FrozenList[T]:
     l: FrozenList = FrozenList()
     l.freeze()
     return l
@@ -326,7 +327,7 @@ class InitSpec(DataClassJsonMixin):
 @dataclass(eq=True, frozen=True)
 class CallsetGroup(DataClassJsonMixin):
     callsets: FrozenList[str] = field(
-        default_factory=frozen, metadata=config(decoder=decode_list_with(str))
+        default_factory=frozenlist, metadata=config(decoder=decode_list_with(str))
     )
 
     def names(self) -> frozenset[str]:
@@ -365,16 +366,20 @@ class Definition(DataClassJsonMixin):
         differentiable_operator_name: If the component can be replicated offline by a
                                       pytorch/tensorflow operation, this is the name of said
                                       operation.
+
+        callset_groups: A list of groups of callsets that can be called at the same time
+                        for the component. The callsets are called in the order of specification
+                        per-group, and only exact matches are allowed
     """
 
     class_name: str
 
     header: str
 
-    output_specs: frozendict[str, OutputSpec] = frozenset()
+    output_specs: FrozenDict[str, OutputSpec] = FrozenDict()
 
-    inputs: frozendict[str, InputType] = field(
-        default_factory=frozendict,
+    inputs: FrozenDict[str, InputType] = field(
+        default_factory=FrozenDict,
         metadata=(
             config(
                 decoder=decode_dict_with(decode_input),
@@ -392,24 +397,24 @@ class Definition(DataClassJsonMixin):
     # On a call, we take the list of written inputs and see if they match against
 
     # Unused for now, but would allow components to send messages to each other
-    # mailbox: frozendict[str, PingInfo] = {}
+    # mailbox: FrozenDict[str, PingInfo] = {}
 
     # Defines what order generic types must be specified, if at all
-    generics_order: frozendict[str, int] = field(
-        default_factory=frozendict,
+    generics_order: FrozenDict[str, int] = field(
+        default_factory=FrozenDict,
     )
 
     init_spec: Optional[InitSpec] = None
 
     default_output: Optional[str] = None
 
-    class_generics: frozendict[str, int] = field(default_factory=frozendict)
+    class_generics: FrozenDict[str, int] = field(default_factory=FrozenDict)
 
     callset_groups: frozenset[CallsetGroup] = frozenset()
 
     differentiable_operator_name: Optional[str] = None
 
-    metadata: frozendict[str, Any] = field(default_factory=frozendict)
+    metadata: FrozenDict[str, Any] = field(default_factory=FrozenDict)
 
     def validate_generics(self):
         for key in self.generics_order:

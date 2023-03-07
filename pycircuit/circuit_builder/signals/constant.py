@@ -1,5 +1,4 @@
 from typing import Any, Dict, Optional
-from frozendict import frozendict
 from pycircuit.circuit_builder.definition import (
     CallSpec,
     Definition,
@@ -9,6 +8,7 @@ from pycircuit.circuit_builder.definition import (
 )
 from pycircuit.circuit_builder.definition import BasicInput
 from pycircuit.circuit_builder.component import HasOutput
+from pycircuit.common.frozen import FrozenDict
 
 
 def clean_float_name(f_name: str) -> str:
@@ -25,7 +25,7 @@ def make_double(val: float) -> HasOutput:
 def generate_constant_definition(constant_type: str, constructor: str) -> Definition:
     defin = Definition(
         class_name=f"CtorConstant<{constant_type}>",
-        output_specs=frozendict(
+        output_specs=FrozenDict(
             out=OutputSpec(
                 ephemeral=True,
                 type_path="Output",
@@ -34,10 +34,10 @@ def generate_constant_definition(constant_type: str, constructor: str) -> Defini
                 default_constructor=f" = {constructor}",
             )
         ),
-        inputs=frozendict(),
+        inputs=FrozenDict(),
         header="signals/constant.hh",
         differentiable_operator_name="constant",
-        metadata=frozendict({"constant_value": constructor}),
+        metadata=FrozenDict({"constant_value": constructor}),
     )
     defin.validate()
     return defin
@@ -48,7 +48,7 @@ def generate_triggerable_constant_definition(
 ) -> Definition:
     defin = Definition(
         class_name=f"TriggerableConstant<{constant_type}>",
-        output_specs=frozendict(
+        output_specs=FrozenDict(
             out=OutputSpec(
                 ephemeral=True,
                 type_path="Output",
@@ -57,7 +57,7 @@ def generate_triggerable_constant_definition(
                 default_constructor=f" = {constructor}",
             )
         ),
-        inputs=frozendict({"tick": BasicInput()}),
+        inputs=FrozenDict({"tick": BasicInput()}),
         header="signals/constant.hh",
         generic_callset=CallSpec(
             written_set=frozenset(["tick"]),
@@ -66,7 +66,7 @@ def generate_triggerable_constant_definition(
             callback="tick",
         ),
         differentiable_operator_name="constant",
-        metadata=frozendict({"constant_value": constructor}),
+        metadata=FrozenDict({"constant_value": constructor}),
     )
 
     defin.validate()
@@ -76,13 +76,13 @@ def generate_triggerable_constant_definition(
 def _do_generate_parameter_definition(required: bool, op_name: str) -> Definition:
     defin = Definition(
         class_name=f"DoubleParameter<{str(required).lower()}>",
-        output_specs=frozendict(
+        output_specs=FrozenDict(
             out=OutputSpec(
                 type_path="Output",
                 always_valid=True,
             )
         ),
-        inputs=frozendict(
+        inputs=FrozenDict(
             {"a": BasicInput(meta=InputMetadata(optional=True, allow_unused=True))}
         ),
         header="signals/parameter.hh",

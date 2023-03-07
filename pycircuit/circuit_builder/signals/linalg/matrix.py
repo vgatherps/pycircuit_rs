@@ -3,7 +3,7 @@ from typing import Callable, List, Optional
 from pycircuit.circuit_builder.circuit import HasOutput
 from pycircuit.circuit_builder.circuit_context import CircuitContextManager
 from pycircuit.circuit_builder.signals.regressions.linreg import LinReg
-from ..running_name import get_novel_name
+from pycircuit.circuit_builder.signals.running_name import get_novel_name
 
 # TODO proper matrix abstraction
 
