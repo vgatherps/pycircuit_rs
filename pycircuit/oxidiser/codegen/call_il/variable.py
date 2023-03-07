@@ -1,5 +1,7 @@
 from dataclasses import dataclass
 from typing import List
+from pycircuit.circuit_builder.component import ComponentOutput
+from pycircuit.oxidiser.codegen import separated_names
 
 from pycircuit.oxidiser.codegen.tree.tree_node import (
     CodeLeaf,
@@ -43,9 +45,7 @@ class StoredVar(CodeLeaf):
 
 @dataclass(eq=True, frozen=True)
 class PerCallValid(GlobalInitLeaf):
-    variable_name: str
-    variable_type: str
-    variable_constructor: str
+    output: ComponentOutput
     valid_by_default: bool
 
     def generate_init_code(self) -> str:
@@ -53,28 +53,37 @@ class PerCallValid(GlobalInitLeaf):
         return _generate_valid_init(valid_name, "mut", self.valid_by_default)
 
     def valid_path(self) -> str:
-        return _valid_name(self.variable_name)
+        return _valid_name(self.variable_name())
+
+    def variable_name(self) -> str:
+        return f"{self.output.parent}_{self.output.output_name}"
 
 
 @dataclass(eq=True, frozen=True)
 class StoredValid(CodeLeaf):
-    variable_name: str
+    output: ComponentOutput
     outputs_name: str
 
     def valid_path(self) -> str:
         return f"{self.outputs_name}.{self.variable_name}"
 
+    def variable_name(self) -> str:
+        return f"{self.output.parent}_{self.output.output_name}"
+
 
 @dataclass(eq=True, frozen=True)
 class AlwaysValid(GlobalInitLeaf):
-    variable_name: str
+    output: ComponentOutput
 
     def generate_init_code(self) -> str:
         valid_name = self.valid_path()
         return _generate_valid_init(valid_name, "", True)
 
     def valid_path(self) -> str:
-        return _valid_name(self.variable_name)
+        return _valid_name(self.variable_name())
+
+    def variable_name(self) -> str:
+        return f"{self.output.parent}_{self.output.output_name}"
 
 
 GraphVar = PerCallVar | StoredVar

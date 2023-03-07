@@ -1,13 +1,12 @@
 from abc import ABC, abstractmethod
-from collections import OrderedDict
 from dataclasses import dataclass, field
 import dataclasses
-from typing import Any, Dict, List, Mapping, Optional, Set, Union
+from typing import Any, Dict, List, Optional, Set
 
 from dataclasses_json import DataClassJsonMixin
 from frozenlist import FrozenList
 from pycircuit.circuit_builder.definition import Definition, BasicInput, ArrayInput
-from pycircuit.circuit_builder.definition import InputType, InputMetadata
+from pycircuit.circuit_builder.definition import InputType
 from pycircuit.common.frozen import FrozenDict
 
 
