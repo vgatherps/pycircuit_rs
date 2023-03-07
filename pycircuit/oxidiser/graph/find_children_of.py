@@ -1,9 +1,14 @@
 from collections import OrderedDict
 from dataclasses import dataclass
-from typing import Dict, List, Set
+from typing import Collection, Dict, List, Set
 
 from pycircuit.circuit_builder.circuit import CircuitData
-from pycircuit.circuit_builder.component import Component, ComponentOutput
+from pycircuit.circuit_builder.component import (
+    Component,
+    ComponentOutput,
+    GraphOutput,
+    ExternalOutput,
+)
 from pycircuit.circuit_builder.definition import CallSpec
 from pycircuit.oxidiser.graph.callset import find_callset_for
 
@@ -19,7 +24,7 @@ class CalledComponent:
 # This is not fast, but in practice
 # there will only be one iteration of actual work since insertions into the circuit
 # already tend to happen in order
-def topologically_sort(
+def conservative_topological_sort(
     circuit: CircuitData, used_outputs: Set[ComponentOutput]
 ) -> List[Component]:
     used_outputs = set(used_outputs)
@@ -44,10 +49,10 @@ def topologically_sort(
                 for i_output in i.outputs()
             ):
                 potentially_written = {
-                    ComponentOutput(parent=component.name, output_name=field)
+                    GraphOutput(parent=component.name, output_name=field)
                     for field in component.definition.outputs()
                 }
-                used_outputs |= potentially_written
+                used_outputs = used_outputs | potentially_written
                 did_work = True
                 conservatively_called[component.name] = component
 
@@ -64,16 +69,17 @@ def topologically_sort(
 
 
 def find_all_children_of_from_outputs(
-    circuit: CircuitData, used_outputs: Set[ComponentOutput]
+    circuit: CircuitData, used_outputs: Collection[ComponentOutput]
 ) -> List[CalledComponent]:
 
-    sorted = topologically_sort(circuit, used_outputs)
+    seen_outputs = set(used_outputs)
+
+    sorted = conservative_topological_sort(circuit, seen_outputs)
 
     # With a topologically sorted set of inputs
     # iterate through them and discover what writesets actually propagate
 
     called = []
-    seen_outputs = set(used_outputs)
     for component in sorted:
         # Skip calling components where *nothing* is triggered
         # TODO is this correct?
@@ -92,7 +98,7 @@ def find_all_children_of_from_outputs(
 
             writes = callset.outputs
             new_outs = {
-                ComponentOutput(parent=component.name, output_name=field)
+                GraphOutput(parent=component.name, output_name=field)
                 for field in writes
             }
 
@@ -106,7 +112,5 @@ def find_all_children_of_from_outputs(
 def find_all_children_of(
     external_set: Set[str], circuit: CircuitData
 ) -> List[CalledComponent]:
-    used_outputs = {
-        ComponentOutput(parent="external", output_name=e) for e in external_set
-    }
+    used_outputs = {ExternalOutput(external_name=e) for e in external_set}
     return find_all_children_of_from_outputs(circuit, used_outputs)

@@ -94,12 +94,31 @@ class HasOutput(ABC):
 
 
 @dataclass(frozen=True, eq=True)
-class ComponentOutput(DataClassJsonMixin, HasOutput):
+class ExternalOutput(DataClassJsonMixin, HasOutput):
+    external_name: str
+
+    @property
+    def parent(self) -> str:
+        return "external"
+
+    @property
+    def output_name(self) -> str:
+        return self.external_name
+
+    def output(self) -> "ExternalOutput":
+        return self
+
+
+@dataclass(frozen=True, eq=True)
+class GraphOutput(DataClassJsonMixin, HasOutput):
     parent: str
     output_name: str
 
-    def output(self) -> "ComponentOutput":
+    def output(self) -> "GraphOutput":
         return self
+
+
+ComponentOutput = GraphOutput | ExternalOutput
 
 
 @dataclass
@@ -110,7 +129,7 @@ class ExternalInput(DataClassJsonMixin, HasOutput):
     must_trigger: bool = False
 
     def output(self) -> ComponentOutput:
-        return ComponentOutput(parent="external", output_name=self.name)
+        return ExternalOutput(external_name=self.name)
 
 
 @dataclass(eq=True, frozen=True)
@@ -204,7 +223,7 @@ class Component(HasOutput):
                     raise ValueError(
                         f"Component {self.name} does not have output {which}"
                     )
-                return ComponentOutput(
+                return GraphOutput(
                     parent=self.name,
                     output_name=which,
                 )

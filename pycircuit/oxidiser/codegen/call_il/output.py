@@ -66,6 +66,17 @@ class CallOutputSet(CodeTree):
         ]
         return local_input_children + [OutputStructLeaf(self)]
 
+    def valid_set(self) -> "OutputValidSet":
+        return OutputValidSet(
+            outputs=[
+                OutputValid(
+                    valid=output.variable.valid,
+                    output_name=output.output_name,
+                )
+                for output in self.outputs
+            ]
+        )
+
 
 # This does not partake in the code tree since it's just a helper
 # to condense information already in other trees

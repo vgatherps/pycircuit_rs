@@ -1,6 +1,11 @@
 from frozenlist import FrozenList
 from pycircuit.common.frozen import FrozenDict
-from pycircuit.circuit_builder.component import Component, ComponentInput
+from pycircuit.circuit_builder.component import (
+    Component,
+    ComponentInput,
+    ExternalOutput,
+    GraphOutput,
+)
 from pycircuit.circuit_builder.definition import (
     CallSpec,
     Definition,
@@ -23,19 +28,19 @@ OUT_C = "out_c"
 OUT_C_CLASS = "OutC"
 
 A_INPUT = SingleComponentInput(
-    input=ComponentOutput(parent="external", output_name="val_a"), input_name="a"
+    input=ExternalOutput(external_name="val_a"), input_name="a"
 )
 B_INPUT = SingleComponentInput(
-    ComponentOutput(parent="fake", output_name="fake_out"), input_name="b"
+    GraphOutput(parent="fake", output_name="fake_out"), input_name="b"
 )
 C_INPUT = SingleComponentInput(
-    ComponentOutput(parent="fake", output_name="fake_out_c"), input_name="c"
+    GraphOutput(parent="fake", output_name="fake_out_c"), input_name="c"
 )
 D_INPUT = SingleComponentInput(
-    ComponentOutput(parent="fake", output_name="fake_out_d"), input_name="d"
+    GraphOutput(parent="fake", output_name="fake_out_d"), input_name="d"
 )
 E_INPUT = SingleComponentInput(
-    ComponentOutput(parent="fake", output_name="fake_out_e"), input_name="e"
+    GraphOutput(parent="fake", output_name="fake_out_e"), input_name="e"
 )
 
 AB_CALLSET = CallSpec(
