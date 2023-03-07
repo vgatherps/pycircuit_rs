@@ -17,7 +17,7 @@ from pycircuit.oxidiser.graph.callset import find_callset_for
 
 @dataclass
 class CalledComponent:
-    callset: CallSpec
+    callsets: List[CallSpec]
     component: Component
 
 
@@ -104,7 +104,7 @@ def find_all_children_of_from_outputs(
 
             seen_outputs |= new_outs
 
-            called.append(CalledComponent(callset=callset, component=component))
+        called.append(CalledComponent(callsets=callsets, component=component))
 
     return called
 

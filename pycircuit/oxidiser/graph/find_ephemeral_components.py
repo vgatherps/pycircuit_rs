@@ -1,4 +1,4 @@
-from typing import List, Set
+from typing import Dict, List, Set
 from pycircuit.circuit_builder.circuit import CircuitData
 from pycircuit.circuit_builder.component import ComponentOutput
 from pycircuit.oxidiser.graph.ephemeral import find_nonephemeral_outputs
@@ -9,15 +9,8 @@ from pycircuit.oxidiser.graph.find_children_of import (
 )
 
 
-def find_all_subgraphs(circuit: CircuitData) -> List[List[CalledComponent]]:
-    called = []
-
-    for call_group in circuit.call_groups.values():
-        children = find_all_children_of(call_group.inputs, circuit)
-        called.append(children)
-
-    # find timer subgraphs
-
+def find_timer_subgraphs(circuit: CircuitData) -> Dict[str, List[CalledComponent]]:
+    timer_calls = {}
     for component in circuit.components.values():
         if component.definition.timer_callset is not None:
             timer_outputs = {
@@ -26,10 +19,20 @@ def find_all_subgraphs(circuit: CircuitData) -> List[List[CalledComponent]]:
             }
             timer_children = find_all_children_of_from_outputs(circuit, timer_outputs)
             called_component = CalledComponent(
-                callset=component.definition.timer_callset, component=component
+                callsets=[component.definition.timer_callset], component=component
             )
-            all_timer_calls = [called_component] + timer_children
-            called.append(all_timer_calls)
+            timer_calls[component.name] = [called_component] + timer_children
+    return timer_calls
+
+
+def find_all_subgraphs(circuit: CircuitData) -> List[List[CalledComponent]]:
+    called = []
+
+    for call_group in circuit.call_groups.values():
+        children = find_all_children_of(call_group.inputs, circuit)
+        called.append(children)
+
+    called += list(find_timer_subgraphs(circuit).values())
 
     return called
 

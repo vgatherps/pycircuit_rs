@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 from typing import List
-from pycircuit.oxidiser.codegen.generator import CodeLeaf, CodeTree, TreeNode
+from pycircuit.oxidiser.codegen.tree.tree_node import CodeLeaf, CodeTree, TreeNode
 
-from pycircuit.oxidiser.codegen.graph.graph_variable import (
+from pycircuit.oxidiser.codegen.call_il.graph_variable import (
     AlwaysValid,
     GraphValid,
     GraphVariable,

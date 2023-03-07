@@ -4,7 +4,7 @@ from pycircuit.oxidiser.codegen.call_il.dispatch import CallDispatch
 
 from pycircuit.oxidiser.codegen.call_il.input import CallInputSet
 from pycircuit.oxidiser.codegen.call_il.output import CallOutputSet
-from pycircuit.oxidiser.codegen.generator import CodeTree, TreeNode
+from pycircuit.oxidiser.codegen.tree.tree_node import CodeTree, TreeNode
 
 
 @dataclass(frozen=True, eq=True)

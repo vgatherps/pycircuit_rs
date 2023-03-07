@@ -1,13 +1,13 @@
 from dataclasses import dataclass
 from typing import List
 
-from pycircuit.oxidiser.codegen.generator import (
+from pycircuit.oxidiser.codegen.tree.tree_node import (
     CodeLeaf,
     CodeTree,
     GlobalInitLeaf,
     TreeNode,
 )
-from pycircuit.oxidiser.codegen.line_literal import LineLiteral
+from pycircuit.oxidiser.codegen.tree.line_literal import LineLiteral
 
 
 @dataclass(frozen=True, eq=True)

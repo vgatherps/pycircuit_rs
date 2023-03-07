@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import List
 
-from pycircuit.oxidiser.codegen.generator import (
+from pycircuit.oxidiser.codegen.tree.tree_node import (
     CodeLeaf,
     TreeNode,
     CodeTree,

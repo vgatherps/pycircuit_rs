@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Optional
 
-from pycircuit.oxidiser.codegen.generator import CodeLeaf
+from pycircuit.oxidiser.codegen.tree.tree_node import CodeLeaf
 from pycircuit.oxidiser.codegen.call_il.input import INPUT_STRUCT_NAME
 from pycircuit.oxidiser.codegen.call_il.output import (
     OUTPUT_STRUCT_NAME,
