@@ -6,7 +6,6 @@ use syn::{
     braced,
     parse::{Parse, ParseStream},
     punctuated::Punctuated,
-    token::Token,
 };
 
 pub type COLLECTION_SEP = syn::Token![,];
