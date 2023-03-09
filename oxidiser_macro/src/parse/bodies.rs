@@ -1,11 +1,13 @@
 use proc_macro2::Ident;
 use syn::parse::Parse;
 
-use crate::{
+use crate::parse::{
     kws::{Observes, Takes, Writes},
     parse_helpers::{parse_named, ParseMapOf, ParseSetOf},
     types::InputType,
 };
+
+use super::types::OutputType;
 
 pub struct InputBody {
     pub inputs: ParseMapOf<Ident, InputType>,
@@ -20,7 +22,7 @@ impl Parse for InputBody {
 }
 
 pub struct OutputBody {
-    pub outputs: ParseMapOf<Ident, InputType>,
+    pub outputs: ParseMapOf<Ident, OutputType>,
 }
 
 impl Parse for OutputBody {

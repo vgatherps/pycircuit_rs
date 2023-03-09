@@ -54,23 +54,14 @@ oxidiser_component! {
 }
 */
 
-use bodies::{AllCallsBody, InputBody, OutputBody};
-use kws::{Calls, Inputs, Name, Outputs};
-use parse_helpers::{parse_body_term, parse_named};
-use proc_macro2::Ident;
-use syn::parse::ParseStream;
+use syn::parse_macro_input;
 
-mod bodies;
-mod kws;
-mod parse_helpers;
-mod types;
+mod codegen;
+mod parse;
 
-fn parse_stream(input: ParseStream) -> syn::Result<()> {
-    let name = parse_body_term(parse_named::<Name, Ident>, input)?;
-
-    let inputs = parse_body_term(parse_named::<Inputs, InputBody>, input)?;
-    let outputs = parse_body_term(parse_named::<Outputs, OutputBody>, input)?;
-    let all_calls = parse_body_term(parse_named::<Calls, AllCallsBody>, input)?;
-
-    Ok(())
+#[proc_macro]
+pub fn oxidiser_component(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    let component = parse_macro_input!(input as parse::ComponentDefinition);
+    let code = codegen::codegen(&component);
+    code.into()
 }

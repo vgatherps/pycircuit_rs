@@ -1,7 +1,7 @@
 use proc_macro2::Ident;
 use syn::{parse::Parse, token::Type as TType, Type};
 
-use crate::kws;
+use crate::parse::kws;
 
 pub enum InputType {
     Generic(Ident),
