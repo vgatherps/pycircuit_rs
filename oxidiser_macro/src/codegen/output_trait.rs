@@ -26,10 +26,6 @@ fn generate_fnc_for(name: &Ident, ty: &OutputType) -> TokenStream {
     quote! {fn #name(&self) -> &mut #inner_ty;}
 }
 
-fn generate_type_for(generic: &Ident) -> TokenStream {
-    quote! {type #generic;}
-}
-
 pub fn generate_output_trait(
     component: &ComponentDefinition,
     call_name: &Ident,

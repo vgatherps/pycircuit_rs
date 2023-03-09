@@ -8,10 +8,10 @@ use syn::{
     punctuated::Punctuated,
 };
 
-pub type COLLECTION_SEP = syn::Token![,];
-pub type BODY_SEP = syn::Token![;];
-pub type NAME_SEP = syn::Token![:];
-pub type DICT_SEP = syn::Token![->];
+pub type CollectionSep = syn::Token![,];
+pub type BodySep = syn::Token![;];
+pub type NameSep = syn::Token![:];
+pub type DictSep = syn::Token![->];
 
 pub fn parse_separated<K: Parse, S: Parse, V: Parse>(tokens: ParseStream) -> syn::Result<(K, V)> {
     let key = tokens.parse()?;
@@ -25,35 +25,33 @@ pub fn parse_body_term<T>(
     tokens: ParseStream,
 ) -> syn::Result<T> {
     let val = fnc(tokens)?;
-    tokens.parse::<BODY_SEP>()?;
+    tokens.parse::<BodySep>()?;
     Ok(val)
 }
 
 pub fn parse_named<K: Parse, V: Parse>(tokens: ParseStream) -> syn::Result<V> {
-    Ok(parse_separated::<K, NAME_SEP, V>(tokens)?.1)
+    Ok(parse_separated::<K, NameSep, V>(tokens)?.1)
 }
 
-pub fn parse_vec_of<T, P>(tokens: ParseStream) -> syn::Result<Vec<T>>
+pub fn parse_vec_of<T>(tokens: ParseStream) -> syn::Result<Vec<T>>
 where
     T: Parse,
-    P: Parse,
 {
     let content;
     braced!(content in tokens);
 
-    let punctuated: Punctuated<_, COLLECTION_SEP> = content.parse_terminated(T::parse)?;
+    let punctuated: Punctuated<_, CollectionSep> = content.parse_terminated(T::parse)?;
     Ok(punctuated.into_iter().collect())
 }
 
-pub fn parse_set_of<T, P>(tokens: ParseStream) -> syn::Result<HashSet<T>>
+pub fn parse_set_of<T>(tokens: ParseStream) -> syn::Result<HashSet<T>>
 where
     T: Parse + Hash + Eq + Debug,
-    P: Parse,
 {
     let content;
     braced!(content in tokens);
 
-    let punctuated: Punctuated<_, COLLECTION_SEP> = content.parse_terminated(T::parse)?;
+    let punctuated: Punctuated<_, CollectionSep> = content.parse_terminated(T::parse)?;
     let as_vec: Vec<_> = punctuated.into_iter().collect();
 
     let mut set = HashSet::new();
@@ -77,7 +75,7 @@ struct DictEntry<K, V> {
 
 impl<K: Parse, V: Parse> Parse for DictEntry<K, V> {
     fn parse(input: ParseStream) -> syn::Result<Self> {
-        let (key, value) = parse_separated::<K, DICT_SEP, V>(input)?;
+        let (key, value) = parse_separated::<K, DictSep, V>(input)?;
         Ok(DictEntry { key, value })
     }
 }
@@ -115,7 +113,7 @@ pub struct ParseVecOf<T> {
 impl<T: Parse> Parse for ParseVecOf<T> {
     fn parse(input: ParseStream) -> syn::Result<Self> {
         Ok(ParseVecOf {
-            set: parse_vec_of::<_, COLLECTION_SEP>(input)?,
+            set: parse_vec_of::<_>(input)?,
         })
     }
 }
@@ -127,7 +125,7 @@ pub struct ParseSetOf<T> {
 impl<T: Parse + Hash + Eq + Debug> Parse for ParseSetOf<T> {
     fn parse(input: ParseStream) -> syn::Result<Self> {
         Ok(ParseSetOf {
-            set: parse_set_of::<_, COLLECTION_SEP>(input)?,
+            set: parse_set_of::<_>(input)?,
         })
     }
 }
@@ -139,7 +137,7 @@ pub struct ParseMapOf<K, V> {
 impl<K: Parse + Hash + Eq + Debug, V: Parse> Parse for ParseMapOf<K, V> {
     fn parse(input: ParseStream) -> syn::Result<Self> {
         Ok(ParseMapOf {
-            map: parse_dict_of::<_, _, COLLECTION_SEP>(input)?,
+            map: parse_dict_of::<_, _, CollectionSep>(input)?,
         })
     }
 }
