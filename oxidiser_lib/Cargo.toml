@@ -7,3 +7,6 @@ edition = "2021"
 
 [dependencies]
 linkme = "0.3.8"
+
+# Workspace dependencies
+oxidiser_macro = {path = "../oxidiser_macro"}

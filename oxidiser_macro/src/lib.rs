@@ -37,17 +37,17 @@ oxidiser_component! {
         add: {
             // The inputs to this specific call. If the whole set of inputs is triggered,
             // then this call will be called
-            Takes {
+            Takes: {
                 a,
                 b,
             };
 
             // inputs which are visible to the call but do not impact triggering
-            Observes {};
+            Observes: {c};
 
             // The outputs to this specific call
-            Writer {
-                out,
+            Writes: {
+                out1,
             };
         };
     }
@@ -63,5 +63,6 @@ mod parse;
 pub fn oxidiser_component(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let component = parse_macro_input!(input as parse::ComponentDefinition);
     let code = codegen::codegen(&component);
+    println!("{}", code.to_string());
     code.into()
 }

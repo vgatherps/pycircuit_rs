@@ -1,10 +1,11 @@
 use std::collections::{HashMap, HashSet};
 
-use convert_case::{Case::Camel, Converter};
 use proc_macro2::{Ident, TokenStream};
 use quote::quote;
 
 use crate::parse::{bodies::CallBody, types::InputType, ComponentDefinition};
+
+use super::case::pascal_ident_span;
 
 const INPUT_TRAIT_SUFFIX: &str = "Input";
 
@@ -37,7 +38,7 @@ fn generate_all_types(input: &[&InputType]) -> TokenStream {
     let all_types = all_generics.into_iter().map(generate_type_for);
 
     quote! {
-        #(#all_types);*
+        #(#all_types)*
     }
 }
 
@@ -62,15 +63,10 @@ pub fn generate_input_trait(
         .iter()
         .map(|(input, ty)| generate_fnc_for(input, ty));
 
-    let to_camel = Converter::new().from_case(Camel);
-    // CamelCase
-    let camelcase_component = to_camel.convert(component.name.to_string());
-    let camelcase_call = to_camel.convert(call_name.to_string());
-
-    let call_trait = format!("{camelcase_component}{camelcase_call}{INPUT_TRAIT_SUFFIX}");
-
-    let call_ident = Ident::new(&call_trait, call_name.span());
-
+    let call_ident = pascal_ident_span(
+        &[&component.name, call_name, &INPUT_TRAIT_SUFFIX],
+        call_name.span(),
+    );
     quote! {
         pub trait #call_ident {
             #all_types

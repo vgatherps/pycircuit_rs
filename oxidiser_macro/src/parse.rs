@@ -18,11 +18,11 @@ pub struct ComponentDefinition {
 
 impl Parse for ComponentDefinition {
     fn parse(input: ParseStream) -> syn::Result<Self> {
-        let name = parse_body_term(parse_named::<Name, Ident>, input)?;
+        let name = parse_body_term(parse_named::<Name, _>, input)?;
 
-        let inputs = parse_body_term(parse_named::<Inputs, InputBody>, input)?;
-        let outputs = parse_body_term(parse_named::<Outputs, OutputBody>, input)?;
-        let all_calls = parse_body_term(parse_named::<Calls, AllCallsBody>, input)?;
+        let inputs = parse_body_term(parse_named::<Inputs, _>, input)?;
+        let outputs = parse_body_term(parse_named::<Outputs, _>, input)?;
+        let all_calls = parse_body_term(parse_named::<Calls, _>, input)?;
 
         let def = ComponentDefinition {
             name,
