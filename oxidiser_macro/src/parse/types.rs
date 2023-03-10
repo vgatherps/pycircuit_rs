@@ -3,11 +3,13 @@ use syn::{parse::Parse, token::Type as TType, Type};
 
 use crate::parse::kws;
 
+#[derive(Clone)]
 pub enum InputType {
     Generic(Ident),
     Concrete(Type),
 }
 
+#[derive(Clone)]
 pub enum OutputType {
     FromTrait(Ident),
     Concrete(Type),

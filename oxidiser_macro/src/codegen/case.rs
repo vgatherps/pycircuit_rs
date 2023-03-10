@@ -10,7 +10,3 @@ pub fn pascal_ident_span(as_strs: &[&dyn ToString], span: Span) -> Ident {
 
     Ident::new(&ident, span)
 }
-
-pub fn pascal_ident(as_strs: &[&dyn ToString]) -> Ident {
-    pascal_ident_span(as_strs, Span::call_site())
-}

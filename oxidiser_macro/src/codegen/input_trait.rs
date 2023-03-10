@@ -42,6 +42,27 @@ fn generate_all_types(input: &[&InputType]) -> TokenStream {
     }
 }
 
+pub fn generate_input_trait_for(
+    input_to_call: HashMap<Ident, InputType>,
+    trait_name: Ident,
+) -> TokenStream {
+    let relevant_inputs: Vec<_> = input_to_call.values().collect();
+
+    let all_types = generate_all_types(&relevant_inputs);
+
+    let all_fncs = input_to_call
+        .iter()
+        .map(|(input, ty)| generate_fnc_for(input, ty));
+
+    quote! {
+        pub trait #trait_name {
+            #all_types
+
+            #(#all_fncs)*
+        }
+    }
+}
+
 pub fn generate_input_trait(
     component: &ComponentDefinition,
     call_name: &Ident,
@@ -52,26 +73,16 @@ pub fn generate_input_trait(
         .set
         .iter()
         .chain(call.observes.set.iter())
-        .map(|input| (input, component.inputs.inputs.map.get(input).unwrap()))
+        .map(|input| {
+            (
+                input.clone(),
+                component.inputs.inputs.map.get(input).unwrap().clone(),
+            )
+        })
         .collect();
-
-    let relevant_inputs: Vec<_> = input_to_call.values().copied().collect();
-
-    let all_types = generate_all_types(&relevant_inputs);
-
-    let all_fncs = input_to_call
-        .iter()
-        .map(|(input, ty)| generate_fnc_for(input, ty));
-
     let call_ident = pascal_ident_span(
         &[&component.name, call_name, &INPUT_TRAIT_SUFFIX],
         call_name.span(),
     );
-    quote! {
-        pub trait #call_ident {
-            #all_types
-
-            #(#all_fncs)*
-        }
-    }
+    generate_input_trait_for(input_to_call, call_ident)
 }
