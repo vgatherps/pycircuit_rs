@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import List
+from typing import List, Optional
 
 from pycircuit.oxidiser.codegen.tree.tree_node import (
     CodeLeaf,
@@ -13,10 +13,14 @@ from pycircuit.oxidiser.codegen.tree.line_literal import LineLiteral
 @dataclass(frozen=True, eq=True)
 class Scoped(CodeTree):
     inner: TreeNode
+    prefix: Optional[str] = None
+    suffix: Optional[str] = None
 
     def get_tree_children(self) -> List["TreeNode"]:
-        open = LineLiteral("{")
-        close = LineLiteral("}")
+        prefix_str = self.prefix or ""
+        suffix_str = self.suffix or ""
+        open = LineLiteral(prefix_str + " {")
+        close = LineLiteral("}" + suffix_str)
         match self.inner:
             case CodeTree():
                 return [open] + self.inner.get_tree_children() + [close]
