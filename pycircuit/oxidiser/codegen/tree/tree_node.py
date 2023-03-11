@@ -8,10 +8,18 @@ class CodeLeaf(ABC):
         ...
 
 
-class GlobalInitLeaf(Hashable, ABC):
+# Inheriting hashable doesn't seem to work
+class GlobalInitLeaf(ABC):
     @abstractmethod
     def generate_global_init_code(self) -> str:
         ...
+
+    def key(self) -> Hashable:
+        try:
+            self.__hash__()
+            return self
+        except:
+            raise NotImplementedError("Did not provide key and was not hashable")
 
 
 class CodeTree(ABC):

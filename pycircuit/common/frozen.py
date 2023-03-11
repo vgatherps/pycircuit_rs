@@ -1,4 +1,4 @@
-from typing import Generic, Sequence, Tuple, TypeVar
+from typing import Generic, Optional, Sequence, Tuple, TypeVar
 from frozendict.core import frozendict
 
 K = TypeVar("K")
@@ -29,3 +29,6 @@ class FrozenDict(frozendict, Generic[K, V]):
 
     def values(self) -> Sequence[V]:  # type: ignore
         return super().values()  # type: ignore
+
+    def get(self, __key: K, __default: Optional[V] = None) -> Optional[V]:
+        return super().get(__key, __default)

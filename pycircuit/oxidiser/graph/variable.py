@@ -70,6 +70,9 @@ class StoredValid(CodeLeaf, OutputVar):
     def valid_path(self) -> str:
         return f"self.{_OUTPUT_NAME}.{self.variable_name()}"
 
+    def generate_code(self) -> str:
+        raise NotImplementedError()
+
 
 @dataclass(eq=True, frozen=True)
 class AlwaysValid(GlobalInitLeaf, OutputVar):

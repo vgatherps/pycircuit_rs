@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import List
 from pycircuit.oxidiser.codegen.tree.tree_node import CodeLeaf, CodeTree, TreeNode
 
-from pycircuit.oxidiser.codegen.call_il.variable import GraphVariable
+from pycircuit.oxidiser.graph.variable import GraphVariable
 
 _RAW_INPUT_HEADER = "__raw_input_"
 

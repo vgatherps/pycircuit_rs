@@ -10,13 +10,16 @@ from pycircuit.circuit_builder.component import (
     GraphOutput,
 )
 from pycircuit.common.frozen import FrozenDict
-from pycircuit.oxidiser.codegen.call_il.variable import (
+from pycircuit.oxidiser.codegen.struct_il.typedefs.type_names import get_type_for_output
+from pycircuit.oxidiser.graph.variable import (
     AlwaysValid,
     GraphValid,
+    GraphVar,
     GraphVariable,
     PerCallValid,
     PerCallVar,
     StoredValid,
+    StoredVar,
 )
 from pycircuit.oxidiser.graph.graph_metadata import CircuitMetadata
 
@@ -38,7 +41,7 @@ def is_always_valid(output: ComponentOutput, circuit: CircuitData):
             return parent_component.definition.output_specs[output_name].always_valid
 
 
-def invalid_by_default(output: ComponentOutput, circuit: CircuitData):
+def is_invalid_by_default(output: ComponentOutput, circuit: CircuitData):
     match output:
         case ExternalOutput():
             return False
@@ -47,34 +50,57 @@ def invalid_by_default(output: ComponentOutput, circuit: CircuitData):
             return parent_component.definition.output_specs[output_name].assume_invalid
 
 
-def annotate_components(circuit_meta: CircuitMetadata, components: List[Component]):
-    """Annotate components with their input and output variables."""
+def output_to_var(
+    circuit_meta: CircuitMetadata, output: ComponentOutput
+) -> GraphVariable:
     circuit = circuit_meta.circuit
 
-    for component in components:
-
-        input_variables = {}
-
-        for (input_name, input) in component.inputs.items():
-            if isinstance(input, ArrayComponentInput):
-                raise NotImplementedError("Rust version does not support array inputs")
-            the_output = input.output()
-            is_ephemeral = input.output() not in circuit_meta.non_ephemeral_outputs
+    match output:
+        case ExternalOutput():
+            raise NotImplementedError("External variables WIP")
+        case GraphOutput(parent, output_name):
+            the_output = output.output()
+            is_ephemeral = the_output not in circuit_meta.non_ephemeral_outputs
 
             val: Optional[GraphValid] = None
-            always_valid = is_always_valid(input.output(), circuit)
-            invalid_by_default = invalid_by_default(the_output, circuit)
+            var: GraphVar
+
+            always_valid = is_always_valid(the_output, circuit)
+            invalid_by_default = is_invalid_by_default(the_output, circuit)
 
             if always_valid:
                 val = AlwaysValid(output=the_output)
 
-            if is_ephemeral or invalid_by_default:
+            if invalid_by_default:
                 val = val or PerCallValid(output=the_output, valid_by_default=False)
+
+            if is_ephemeral:
+                val = val or PerCallValid(output=the_output, valid_by_default=False)
+                var_type = get_type_for_output(circuit, the_output)
+                output_specs = circuit.components[parent].definition.output_specs.get(
+                    output_name, None
+                )
+                if (
+                    output_specs is not None
+                    and output_specs.default_constructor is not None
+                ):
+                    var_constructor = output_specs.default_constructor
+                else:
+                    var_constructor = "Default::default()"
+                var = PerCallVar(
+                    output=the_output,
+                    variable_type=var_type,
+                    variable_constructor=var_constructor,
+                )
             else:
                 val = val or StoredValid(
                     output=the_output,
                 )
+                var = StoredVar(output=the_output)
+            return GraphVariable(var=var, valid=val)
 
-            raise NotImplementedError(
-                "Have not implemented type naming so can't create variables"
-            )
+
+def outputs_to_var(
+    circuit_meta: CircuitMetadata, outputs: List[ComponentOutput]
+) -> Dict[ComponentOutput, GraphVariable]:
+    return {output: output_to_var(circuit_meta, output) for output in outputs}

@@ -4,7 +4,7 @@ from pycircuit.circuit_builder.component import Component
 from pycircuit.oxidiser.codegen.struct_il.typedefs.type_names import (
     get_component_type_name,
     get_component_valid_name,
-    get_type_for_input,
+    get_type_for_output,
 )
 from pycircuit.oxidiser.codegen.tree.tree_node import CodeLeaf
 
@@ -21,7 +21,7 @@ def get_struct_type(circuit: CircuitData, component: Component):
         ]
 
         types = [
-            get_type_for_input(circuit, input.outputs()[0])
+            get_type_for_output(circuit, input.outputs()[0])
             for input in associated_outputs
         ]
 

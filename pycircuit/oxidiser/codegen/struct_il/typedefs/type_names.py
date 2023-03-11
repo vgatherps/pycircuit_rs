@@ -8,7 +8,7 @@ from pycircuit.circuit_builder.component import (
     GraphOutput,
     SingleComponentInput,
 )
-from pycircuit.oxidiser.codegen.call_il.variable import GraphVariable
+from pycircuit.oxidiser.graph.variable import GraphVariable
 
 from camel_converter import to_pascal
 
@@ -39,7 +39,7 @@ def get_output_alias(component: Component, output: str):
     return f"<{component_path} as {export_trait}>::{output_type}"
 
 
-def get_type_for_input(circuit: CircuitData, output: ComponentOutput) -> str:
+def get_type_for_output(circuit: CircuitData, output: ComponentOutput) -> str:
     match output:
         case ExternalOutput(type):
             return circuit.external_inputs[type].type
