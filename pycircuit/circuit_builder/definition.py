@@ -346,7 +346,7 @@ class Definition(DataClassJsonMixin):
 
         class_name: Name of the component class
 
-        header: Header file that must be included to get class definition
+        module: module path that must be included to get component definition
 
         callsets: A list of the possible triggers (aka callsets) for the component
 
@@ -374,7 +374,7 @@ class Definition(DataClassJsonMixin):
 
     class_name: str
 
-    header: str
+    module: str
 
     output_specs: FrozenDict[str, OutputSpec] = FrozenDict()
 
